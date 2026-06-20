@@ -7,15 +7,31 @@ elsewhere. All work happens on `claude/carcassonne-game-j6jeey`.
 
 ## Plan / Build order (per DESIGN.md)
 1. [x] Project scaffold (Vite + React + TS strict + Vitest)
-2. [ ] Engine types + tile dataset loader (tiles.json) + seeded RNG
-3. [ ] Board + placement validation (edge matching)
-4. [ ] Feature graph + merge + completion detection (roads/cities/monasteries/fields)
-5. [ ] Follower placement + legality (merge-then-block)
-6. [ ] Immediate scoring + majority/tie + return followers
-7. [ ] End-game + final scoring + farmers
-8. [ ] Engine unit tests (all DESIGN.md scenarios) — engine fully green before UI
-9. [ ] React UI over finished engine
-10. [ ] Full-game smoke test + polish
+2. [x] Engine types + tile dataset loader (tiles.json) + seeded RNG
+3. [x] Board + placement validation (edge matching)
+4. [x] Feature graph + merge + completion detection (roads/cities/monasteries/fields)
+5. [x] Follower placement + legality (merge-then-block)
+6. [x] Immediate scoring + majority/tie + return followers
+7. [x] End-game + final scoring + farmers
+8. [x] Engine unit tests (37 tests, all DESIGN.md scenarios) — engine green before UI
+9. [x] React UI over finished engine (programmatic SVG tiles, pan/zoom board,
+       rotate/place, follower placement, score panel, end-game breakdown modal)
+10. [x] Full-game smoke test (fixed seed plays to completion) + UI render smoke test
+
+## Status: COMPLETE
+- `tsc --noEmit`: clean under strict.
+- `vitest run`: 40 tests pass (engine scenarios + UI render smoke).
+- `vite build`: succeeds.
+- A full 2–5 player hot-seat game is playable start to finish: tile placement with
+  rotation, optional follower placement, immediate scoring, end-game scoring of
+  incomplete features and farmers, declared winner with tie handling.
+
+## Notes on UI
+- Tiles drawn programmatically as SVG (fields/roads/cities/monasteries/pennants).
+- Board is pannable (drag) and zoomable (wheel + buttons), start tile centered.
+- Legal placements highlighted for the current rotation; hover shows a ghost tile.
+- Follower options shown as glowing clickable spots on the just-placed tile.
+- Farmers drawn lying flat (rotated diamond) vs upright discs for others.
 
 ## Key design decisions
 - **Coordinate system:** integer (x,y), start tile D at (0,0). y increases downward
