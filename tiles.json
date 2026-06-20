@@ -1,0 +1,1038 @@
+{
+  "_schema": {
+    "description": "Canonical Carcassonne base-game tile distribution: 24 tile types (ids A-X), 72 tiles total including 1 start tile. Pins deck composition AND per-tile field topology so every implementation works against an identical dataset. Field geometry is internally consistent and may not perfectly mirror the printed tiles; that is acceptable by design.",
+    "edges": "n/e/s/w, each 'city' | 'road' | 'field'. A single reference orientation; the engine applies 0/90/180/270 rotation, permuting edges, city segments, road segments, and field positions together.",
+    "fieldPositions": "Each tile border is divided into 8 field positions, two per edge, split where a road would cross. Clockwise from top-left: NW,NE (north), EN,ES (east), SE,SW (south), WS,WN (west). Positions on a city edge are city, not field, and never appear in a field region.",
+    "cities": "City segments on the tile. Each has a stable id (c0, c1...), the edges it occupies, and a pennant flag (+2 in a completed city, +1 incomplete). Two segments on one tile are NOT connected (e.g. H, I).",
+    "roads": "Road segments as lists of edges. A 2-edge segment is a through road (straight if opposite edges, curved if adjacent). A 1-edge segment terminates inside the tile at a junction hub, city wall, or cloister.",
+    "fields": "Field regions on the tile. Each lists the field positions it covers and the ids of the city segments it borders (this adjacency drives farmer scoring). Across rotation, positions rotate with the tile.",
+    "cloister": "true if the tile has a monastery at its centre.",
+    "count": "Copies of this tile type in the 72-tile deck.",
+    "startTile": "One copy of tile D is the start tile, placed at the origin before play; the remaining 71 are shuffled. D's count of 4 includes that start copy."
+  },
+  "deckSize": 72,
+  "startTile": "D",
+  "tiles": [
+    {
+      "id": "A",
+      "name": "Cloister with road",
+      "count": 2,
+      "edges": {
+        "n": "field",
+        "e": "field",
+        "s": "road",
+        "w": "field"
+      },
+      "cloister": true,
+      "cities": [],
+      "roads": [
+        [
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "NE",
+            "EN",
+            "ES",
+            "SE",
+            "SW",
+            "WS",
+            "WN"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Cloister",
+      "count": 4,
+      "edges": {
+        "n": "field",
+        "e": "field",
+        "s": "field",
+        "w": "field"
+      },
+      "cloister": true,
+      "cities": [],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "NE",
+            "EN",
+            "ES",
+            "SE",
+            "SW",
+            "WS",
+            "WN"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "name": "City, all four edges (pennant)",
+      "count": 1,
+      "edges": {
+        "n": "city",
+        "e": "city",
+        "s": "city",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "e",
+            "s",
+            "w"
+          ],
+          "pennant": true
+        }
+      ],
+      "roads": [],
+      "fields": []
+    },
+    {
+      "id": "D",
+      "name": "City edge with straight road (start tile)",
+      "count": 4,
+      "isStart": true,
+      "edges": {
+        "n": "city",
+        "e": "road",
+        "s": "field",
+        "w": "road"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [
+        [
+          "e",
+          "w"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "EN",
+            "WN"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "ES",
+            "SE",
+            "SW",
+            "WS"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "name": "City on one edge",
+      "count": 5,
+      "edges": {
+        "n": "city",
+        "e": "field",
+        "s": "field",
+        "w": "field"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "EN",
+            "ES",
+            "SE",
+            "SW",
+            "WS",
+            "WN"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "name": "City through two opposite edges (pennant)",
+      "count": 2,
+      "edges": {
+        "n": "field",
+        "e": "city",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "e",
+            "w"
+          ],
+          "pennant": true
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "NE"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "G",
+      "name": "City through two opposite edges",
+      "count": 1,
+      "edges": {
+        "n": "field",
+        "e": "city",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "e",
+            "w"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "NE"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H",
+      "name": "Two separate cities on opposite edges",
+      "count": 3,
+      "edges": {
+        "n": "field",
+        "e": "city",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "e"
+          ],
+          "pennant": false
+        },
+        {
+          "id": "c1",
+          "edges": [
+            "w"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "NE"
+          ],
+          "cities": [
+            "c0",
+            "c1"
+          ]
+        },
+        {
+          "positions": [
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0",
+            "c1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I",
+      "name": "Two separate cities on adjacent edges",
+      "count": 2,
+      "edges": {
+        "n": "city",
+        "e": "city",
+        "s": "field",
+        "w": "field"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n"
+          ],
+          "pennant": false
+        },
+        {
+          "id": "c1",
+          "edges": [
+            "e"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "SE",
+            "SW",
+            "WS",
+            "WN"
+          ],
+          "cities": [
+            "c0",
+            "c1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "J",
+      "name": "City edge with curved road (S-E)",
+      "count": 3,
+      "edges": {
+        "n": "city",
+        "e": "road",
+        "s": "road",
+        "w": "field"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [
+        [
+          "e",
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "ES",
+            "SE"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "EN",
+            "SW",
+            "WS",
+            "WN"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K",
+      "name": "City edge with curved road (S-W)",
+      "count": 3,
+      "edges": {
+        "n": "city",
+        "e": "field",
+        "s": "road",
+        "w": "road"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [
+        [
+          "s",
+          "w"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "SW",
+            "WS"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "EN",
+            "ES",
+            "SE",
+            "WN"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L",
+      "name": "City edge with road T-junction",
+      "count": 3,
+      "edges": {
+        "n": "city",
+        "e": "road",
+        "s": "road",
+        "w": "road"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [
+        [
+          "e"
+        ],
+        [
+          "s"
+        ],
+        [
+          "w"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "WN"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "EN"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "WS",
+            "SW"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "SE",
+            "ES"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "M",
+      "name": "City on two adjacent edges, connected (pennant)",
+      "count": 2,
+      "edges": {
+        "n": "city",
+        "e": "field",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "w"
+          ],
+          "pennant": true
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "EN",
+            "ES",
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "N",
+      "name": "City on two adjacent edges, connected",
+      "count": 3,
+      "edges": {
+        "n": "city",
+        "e": "field",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "w"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "EN",
+            "ES",
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "O",
+      "name": "City on two adjacent edges with curved road (pennant)",
+      "count": 2,
+      "edges": {
+        "n": "city",
+        "e": "road",
+        "s": "road",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "w"
+          ],
+          "pennant": true
+        }
+      ],
+      "roads": [
+        [
+          "e",
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "ES",
+            "SE"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "EN",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P",
+      "name": "City on two adjacent edges with curved road",
+      "count": 3,
+      "edges": {
+        "n": "city",
+        "e": "road",
+        "s": "road",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "w"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [
+        [
+          "e",
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "ES",
+            "SE"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "EN",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Q",
+      "name": "City on three edges (pennant)",
+      "count": 1,
+      "edges": {
+        "n": "city",
+        "e": "city",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "e",
+            "w"
+          ],
+          "pennant": true
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R",
+      "name": "City on three edges",
+      "count": 3,
+      "edges": {
+        "n": "city",
+        "e": "city",
+        "s": "field",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "e",
+            "w"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [],
+      "fields": [
+        {
+          "positions": [
+            "SE",
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S",
+      "name": "City on three edges with road (pennant)",
+      "count": 2,
+      "edges": {
+        "n": "city",
+        "e": "city",
+        "s": "road",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "e",
+            "w"
+          ],
+          "pennant": true
+        }
+      ],
+      "roads": [
+        [
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "SE"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T",
+      "name": "City on three edges with road",
+      "count": 1,
+      "edges": {
+        "n": "city",
+        "e": "city",
+        "s": "road",
+        "w": "city"
+      },
+      "cloister": false,
+      "cities": [
+        {
+          "id": "c0",
+          "edges": [
+            "n",
+            "e",
+            "w"
+          ],
+          "pennant": false
+        }
+      ],
+      "roads": [
+        [
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "SE"
+          ],
+          "cities": [
+            "c0"
+          ]
+        },
+        {
+          "positions": [
+            "SW"
+          ],
+          "cities": [
+            "c0"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U",
+      "name": "Straight road",
+      "count": 8,
+      "edges": {
+        "n": "road",
+        "e": "field",
+        "s": "road",
+        "w": "field"
+      },
+      "cloister": false,
+      "cities": [],
+      "roads": [
+        [
+          "n",
+          "s"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "NE",
+            "EN",
+            "ES",
+            "SE"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "NW",
+            "WN",
+            "WS",
+            "SW"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "V",
+      "name": "Curved road",
+      "count": 9,
+      "edges": {
+        "n": "field",
+        "e": "field",
+        "s": "road",
+        "w": "road"
+      },
+      "cloister": false,
+      "cities": [],
+      "roads": [
+        [
+          "s",
+          "w"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "SW",
+            "WS"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "NW",
+            "NE",
+            "EN",
+            "ES",
+            "SE",
+            "WN"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "W",
+      "name": "Road T-junction",
+      "count": 4,
+      "edges": {
+        "n": "field",
+        "e": "road",
+        "s": "road",
+        "w": "road"
+      },
+      "cloister": false,
+      "cities": [],
+      "roads": [
+        [
+          "e"
+        ],
+        [
+          "s"
+        ],
+        [
+          "w"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "NE",
+            "EN",
+            "WN"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "WS",
+            "SW"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "ES",
+            "SE"
+          ],
+          "cities": []
+        }
+      ]
+    },
+    {
+      "id": "X",
+      "name": "Road crossroads",
+      "count": 1,
+      "edges": {
+        "n": "road",
+        "e": "road",
+        "s": "road",
+        "w": "road"
+      },
+      "cloister": false,
+      "cities": [],
+      "roads": [
+        [
+          "n"
+        ],
+        [
+          "e"
+        ],
+        [
+          "s"
+        ],
+        [
+          "w"
+        ]
+      ],
+      "fields": [
+        {
+          "positions": [
+            "NW",
+            "WN"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "NE",
+            "EN"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "ES",
+            "SE"
+          ],
+          "cities": []
+        },
+        {
+          "positions": [
+            "SW",
+            "WS"
+          ],
+          "cities": []
+        }
+      ]
+    }
+  ]
+}
